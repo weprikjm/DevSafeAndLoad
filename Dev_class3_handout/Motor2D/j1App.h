@@ -45,19 +45,24 @@ public:
 	const char* GetTitle() const;
 	const char* GetOrganization() const;
 
-
-	void Save(const char*) const;
-	void Load(const char*);
+	bool LoadGameNow();
+	bool SaveGameNow();
+	
 	// TODO 1:Create methods to save and load
 	// that can be called anytime, even if they 
 	// will one execute by the very end of the frame
 	// Load / Save
-
+	void Save(const char*) const;
+	void Load(const char*);
+	
 	
 
 private:
 	// Load config file
 	bool LoadConfig();
+
+	// Loads the game file
+	bool LoadGameFile();
 
 	// Call modules before each loop iteration
 	void PrepareUpdate();
@@ -75,8 +80,7 @@ private:
 	bool PostUpdate();
 
 	// Load / Save
-	bool LoadGameNow();
-	bool SaveGameNow();
+
 
 public:
 
@@ -89,16 +93,24 @@ public:
 	j1Scene*			scene;
 	j1FileSystem*		fs;
 
+	bool				wantToSave;
+	bool				wantToLoad;
+	pugi::xml_document	saveData;
+	pugi::xml_document	loadData;
 private:
 
 	p2List<j1Module*>	modules;
 	uint				frames;
 	float				dt;
 	pugi::xml_document	config_file;
-	pugi::xml_document	loadData;
+	
+	
+
 	pugi::xml_node		config;
 	pugi::xml_node		app_config;
 	
+
+	pugi::xml_node*		gameData;
 	pugi::xml_node		cameraCoords;
 
 	int					argc;

@@ -46,6 +46,39 @@ bool j1Scene::Update(float dt)
 	// TODO 5: Call load / save methods when pressing l/s
 
 
+	if (App->input->GetKey(SDL_SCANCODE_L))
+	{
+		if (repeatOnce != true){
+			App->wantToLoad = true; 
+			LOG("LOADING..");
+		}
+		else
+			App->wantToLoad = false;
+	
+		repeatOnce = true;
+	}
+	else
+	{
+		if (!App->input->GetKey(SDL_SCANCODE_S))
+			repeatOnce = false;
+		
+	}
+	
+	if (App->input->GetKey(SDL_SCANCODE_S))
+	{
+		if (repeatOnce != true)
+			App->wantToSave = true;
+		else
+			App->wantToSave = false;
+
+		repeatOnce = true;
+	}
+	else
+	{
+		if (!App->input->GetKey(SDL_SCANCODE_L))
+			repeatOnce = false;
+	}
+
 	if(App->input->GetKey(SDL_SCANCODE_UP) == KEY_REPEAT)
 		App->render->camera.y -= 1;
 
@@ -59,6 +92,12 @@ bool j1Scene::Update(float dt)
 		App->render->camera.x += 1;
 
 	App->render->Blit(img, 0, 0);
+
+
+	
+
+	
+
 	return true;
 }
 
@@ -80,3 +119,4 @@ bool j1Scene::CleanUp()
 
 	return true;
 }
+

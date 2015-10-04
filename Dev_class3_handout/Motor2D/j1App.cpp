@@ -122,10 +122,36 @@ bool j1App::Update()
 		ret = PostUpdate();
 
 	FinishUpdate();
+
 	return ret;
 }
 
 // ---------------------------------------------
+
+bool j1App::LoadGameFile()
+{
+
+	bool ret = true;
+
+	char* buf;
+	int size = App->fs->Load("Partida.xml", &buf);
+	pugi::xml_parse_result result = loadData.load_buffer(buf, size);
+	RELEASE(buf);
+
+	if (result == NULL)
+	{
+		LOG("Could not load map xml file Partida.xml. pugi error: %s", result.description());
+		ret = false;
+	}
+	else
+	{
+		*gameData = loadData.child("GameData");
+		
+	}
+
+	return ret;
+
+}
 bool j1App::LoadConfig()
 {
 	bool ret = true;
@@ -157,11 +183,48 @@ void j1App::PrepareUpdate()
 // ---------------------------------------------
 void j1App::FinishUpdate()
 {
-	if (want_to_save)
-		SaveGameNow();
+
 	
-	if (want_to_load)
+	
+	if (wantToSave)//PAS 2
+	{
+		
+		SaveGameNow();
+		LOG("Trying to save");
+		
+
+		bool ret = true;
+		p2List_item<j1Module*>* item;
+		item = modules.start;
+
+		while (item != NULL && ret == true)
+		{
+			ret = item->data->Save(saveData.child(item->data->name.GetString()));//I pass here the node that belongs to each module
+			item = item->next;
+		}
+		
+		saveData.save_file("Partida.xml");
+
+	}
+	
+	
+	if (wantToLoad)
+	{
+		wantToLoad = false;
 		LoadGameNow();
+		
+
+		bool ret = true;
+		p2List_item<j1Module*>* item;
+		item = modules.start;
+
+		while (item != NULL && ret == true)
+		{
+			ret = item->data->Load(saveData.child(item->data->name.GetString()));
+			item = item->next;
+		}
+	}
+	
 }
 
 // Call modules before each loop iteration
@@ -281,7 +344,7 @@ bool j1App::LoadGameNow()
 	char* buf;
 	int size = App->fs->Load("Partida.xml", &buf);
 
-	pugi::xml_parse_result result = loadData.load_buffer(buf, size);
+	pugi::xml_parse_result result = saveData.load_buffer(buf, size);
 
 	RELEASE(buf);
 
@@ -290,23 +353,51 @@ bool j1App::LoadGameNow()
 		LOG("Could not load map xml file Partida.xml. pugi error: %s", result.description());
 		ret = false;
 	}
-	else
-	{
-		cameraCoords = loadData.child("Render");
-	}
+
 
 	return ret;
 
-
-
-
-	return true;
 	
-
 }
 
  bool j1App::SaveGameNow()
 {
+
+	bool ret = true;
+
+	char* buf;
+	int size = App->fs->Load("Partida.xml", &buf);
+
+	if (size != 0)
+	{
+		pugi::xml_parse_result result = saveData.load_buffer(buf, size);
+
+		RELEASE(buf);
+
+		if (result == NULL)
+		{
+			LOG("Could not load map xml file Partida.xml. pugi error: %s", result.description());
+			ret = false;
+		}
+		//else
+		//{
+			//gameData = &saveData;
+		//}
+	
+	}
+	else
+	{
+
+		saveData.append_child("GameData");
+		
+	}
+
+	
+
+	
+
+
+
 	 return true;
 }
 
@@ -322,7 +413,7 @@ bool j1App::LoadGameNow()
 	 load_game.create(filename);
  }
 
-// TODO 3: Create a simulation of the xml file to read 
+
 
 // TODO 4: Create a method to actually load an xml file
 // then call all the modules to load themselves

@@ -90,8 +90,27 @@ bool j1Render::CleanUp()
 // TODO 6: Create a method to load the state
 // for now it will be camera's x and y
 
-// TODO 8: Create a method to save the state
-// using append_child and append_attribute
+bool j1Render::Load(pugi::xml_node& renderXMLdata)
+{
+	bool ret = true;
+	camera.x = renderXMLdata.child("renderer").attribute("coordx").as_int();;
+	camera.y = renderXMLdata.child("renderer").attribute("coordy").as_int();
+
+	return ret;
+}
+
+
+bool j1Render::Save(pugi::xml_node& renderXMLdata)
+{
+	bool ret = true;
+	App->saveData.append_child("renderer");
+	App->saveData.child("renderer").append_attribute("coordx").set_value(camera.x);
+	App->saveData.child("renderer").append_attribute("coordy").set_value(camera.y);
+
+
+	return ret;
+}
+
 
 void j1Render::SetBackgroundColor(SDL_Color color)
 {
