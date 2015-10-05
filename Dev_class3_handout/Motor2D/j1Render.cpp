@@ -93,7 +93,7 @@ bool j1Render::CleanUp()
 bool j1Render::Load(pugi::xml_node& renderXMLdata)
 {
 	bool ret = true;
-	camera.x = renderXMLdata.child("renderer").attribute("coordx").as_int();;
+	camera.x = renderXMLdata.child("renderer").attribute("coordx").as_int();
 	camera.y = renderXMLdata.child("renderer").attribute("coordy").as_int();
 
 	return ret;
@@ -103,9 +103,9 @@ bool j1Render::Load(pugi::xml_node& renderXMLdata)
 bool j1Render::Save(pugi::xml_node& renderXMLdata)
 {
 	bool ret = true;
-	App->saveData.append_child("renderer");
-	App->saveData.child("renderer").append_attribute("coordx").set_value(camera.x);
-	App->saveData.child("renderer").append_attribute("coordy").set_value(camera.y);
+	pugi::xml_node renderer = renderXMLdata.append_child("camera");
+	renderer.append_attribute("coordx").set_value(camera.x);
+	renderer.append_attribute("coordy").set_value(camera.y);
 
 
 	return ret;

@@ -145,7 +145,7 @@ bool j1App::LoadGameFile()
 	}
 	else
 	{
-		*gameData = loadData.child("GameData");
+		gameData = loadData.child("GameData");
 		
 	}
 
@@ -188,23 +188,8 @@ void j1App::FinishUpdate()
 	
 	if (wantToSave)//PAS 2
 	{
-		
 		SaveGameNow();
-		LOG("Trying to save");
-		
-
-		bool ret = true;
-		p2List_item<j1Module*>* item;
-		item = modules.start;
-
-		while (item != NULL && ret == true)
-		{
-			ret = item->data->Save(saveData.child(item->data->name.GetString()));//I pass here the node that belongs to each module
-			item = item->next;
-		}
-		
-		saveData.save_file("Partida.xml");
-
+	
 	}
 	
 	
@@ -364,52 +349,53 @@ bool j1App::LoadGameNow()
 {
 
 	bool ret = true;
+	LOG("Saving process starting.. ");
 
-	char* buf;
-	int size = App->fs->Load("Partida.xml", &buf);
-
-	if (size != 0)
-	{
-		pugi::xml_parse_result result = saveData.load_buffer(buf, size);
-
-		RELEASE(buf);
-
-		if (result == NULL)
-		{
-			LOG("Could not load map xml file Partida.xml. pugi error: %s", result.description());
-			ret = false;
-		}
-		//else
-		//{
-			//gameData = &saveData;
-		//}
+	pugi::xml_document data;
+	pugi::xml_node root;
 	
+	root = data.append_child("GameData");
+
+	
+	p2List_item<j1Module*>* item;
+	item = modules.start;
+
+	while (item != NULL && ret == true)
+	{
+		ret = item->data->Save(root.append_child(item->data->name.GetString()));//I pass here the node that belongs to each module
+		item = item->next;
+	}
+
+	if (ret == true)
+	{
+		std::stringstream stream;
+		data.save(stream);
+		LOG("%s",stream.str());
+		LOG("%s", save_game.GetString());
+		fs->Save(save_game.GetString(), stream.str().c_str(), stream.str().length());
+		LOG("... finished saving", save_game.GetString());
+
 	}
 	else
-	{
+		LOG("Save process halted from an error in module %s", (item != NULL) ? item->data->name.GetString() : "unknown");
 
-		saveData.append_child("GameData");
-		
-	}
-
+	//data.reset();
+	want_to_save = false;
 	
-
-	
-
+	return ret;
 
 
-	 return true;
 }
 
  void j1App::Save(const char* filename)const
  {
-	 want_to_save = true;
+	 wantToSave = true;
 	 save_game.create(filename);
  }
 
  void j1App::Load(const char* filename)
  {
-	 want_to_save = true;
+	 wantToLoad = true;
 	 load_game.create(filename);
  }
 

@@ -93,7 +93,7 @@ public:
 	j1Scene*			scene;
 	j1FileSystem*		fs;
 
-	bool				wantToSave;
+	mutable bool		wantToSave;
 	bool				wantToLoad;
 	pugi::xml_document	saveData;
 	pugi::xml_document	loadData;
@@ -110,7 +110,7 @@ private:
 	pugi::xml_node		app_config;
 	
 
-	pugi::xml_node*		gameData;
+	pugi::xml_node		gameData;
 	pugi::xml_node		cameraCoords;
 
 	int					argc;

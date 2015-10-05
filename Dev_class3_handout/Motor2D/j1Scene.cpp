@@ -49,7 +49,7 @@ bool j1Scene::Update(float dt)
 	if (App->input->GetKey(SDL_SCANCODE_L))
 	{
 		if (repeatOnce != true){
-			App->wantToLoad = true; 
+			App->Load("SaveGame.xml");
 			LOG("LOADING..");
 		}
 		else
@@ -67,11 +67,12 @@ bool j1Scene::Update(float dt)
 	if (App->input->GetKey(SDL_SCANCODE_S))
 	{
 		if (repeatOnce != true)
-			App->wantToSave = true;
+			App->Save("SaveGame.xml");
 		else
 			App->wantToSave = false;
 
 		repeatOnce = true;
+		LOG("SAVING..");
 	}
 	else
 	{
