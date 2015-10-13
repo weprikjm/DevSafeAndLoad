@@ -387,17 +387,10 @@ bool j1App::LoadGameNow()
 	}
 	else
 	{
-
 		saveData.append_child("GameData");
-		
 	}
 
 	
-
-	
-
-
-
 	 return true;
 }
 
